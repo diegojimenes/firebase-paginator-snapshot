@@ -42,12 +42,12 @@ export default testePaginator = () => ({
                 let listener = query
                     .limit(limit)
                     .onSnapshot((snap) => {
-                        snap.forEach((roteiro) => {
-                            roteiros = {
-                                ...roteiros, [roteiro.id]: roteiro.data()
+                        snap.forEach((doc) => {
+                            data = {
+                                ...data, [doc.id]: doc.data()
                             }
                         })
-                        return callback({ data: toArray(roteiros) })
+                        return callback({ data: toArray(data) })
                     })
                 verificarSeQueryTemResultados(limit, snapshots)
                 listeners.push(listener)
@@ -65,13 +65,13 @@ export default testePaginator = () => ({
                     .onSnapshot((snap) => {
                         // guardando alterações do snapshot para verificar se tem algum item pra deletar
                         changes = [...changes, ...snap.docChanges()]
-                        snap.forEach((roteiro) => {
-                            roteiros = {
-                                ...roteiros, [roteiro.id]: roteiro.data()
+                        snap.forEach((doc) => {
+                            data = {
+                                ...data, [doc.id]: doc.data()
                             }
                         })
                         // salvando novos dados e verificando se tem algum para deletar
-                        return callback({ data: retirarRemovidos(changes, toArray(roteiros)) })
+                        return callback({ data: retirarRemovidos(changes, toArray(data)) })
                     })
                 listeners.push(listener)
                 verificarSeQueryTemResultados(limit, snapshots)
