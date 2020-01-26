@@ -1,28 +1,29 @@
 var data = {}
-var listeners = []
-var end = null
+var listeners = []    // list of listeners
+var end = null       // end position of listener
 var changes = []
 var status = ""
 
 const retirarDaLista = () => {
-    var n = []
-    changes.forEach((e) => {
-        if (!e.type == 'removed' && e.doc.id) {
-            n.push(e)
-        }
-    })
-    changes = n
+    changes = []
 }
 
-const retirarRemovidos = (changes, docs) => {
-    var idsRemove = changes.map(({ type, doc }) => type == 'removed' && doc.id)
-    var n = []
-    docs.forEach((r) => {
-        if (!idsRemove.find((e) => e == r.id)) {
-            n.push(r)
+const atualizarLista = (changes) => {
+    changes.forEach(change => {
+        switch (change.type) {
+            case 'removed': {
+                delete data[change.doc.id];
+                break;
+            }
+            case 'added': {
+                data[change.doc.id] = change.doc.data();
+                break;
+            }
+            default: {
+                data[change.doc.id] = change.doc.data();
+            }
         }
     })
-    return n
 }
 
 const verificarSeQueryTemResultados = (limit, snapshots) => {
@@ -33,52 +34,31 @@ const verificarSeQueryTemResultados = (limit, snapshots) => {
     }
 }
 
-export default testePaginator = () => ({
+const handleSnap = (limit, callback) => (snap) => {
+    changes = [...snap.docChanges()]
+    end = snap.docs[snap.docs.length - 1]
+    atualizarLista(changes)
+    verificarSeQueryTemResultados(limit, snap)
+    retirarDaLista()
+    return callback({ data: toArray(data) })
+}
+/**
+ * Get: chamando quando deseja obter registros, iniciais ou nao.
+ */
+export default paginator = () => ({
     get: (query, callback, limit) => {
-        return query
-            .limit(limit).onSnapshot((snapshots) => {
-                // definindo o fim da ultima lista
-                end = snapshots.docs[snapshots.docs.length - 1]
-                let listener = query
-                    .limit(limit)
-                    .onSnapshot((snap) => {
-                        snap.forEach((doc) => {
-                            data = {
-                                ...data, [doc.id]: doc.data()
-                            }
-                        })
-                        return callback({ data: toArray(data) })
-                    })
-                verificarSeQueryTemResultados(limit, snapshots)
-                listeners.push(listener)
-            })
-    },
-    more: (query, callback, limit) => {
-        return query
-            .startAt(end)
-            .limit(limit).onSnapshot((snapshots) => {
-                // definindo o fim da ultima lista
-                end = snapshots.docs[snapshots.docs.length - 1]
-                let listener = query
-                    .startAt(end)
-                    .limit(limit)
-                    .onSnapshot((snap) => {
-                        // guardando alterações do snapshot para verificar se tem algum item pra deletar
-                        changes = [...changes, ...snap.docChanges()]
-                        snap.forEach((doc) => {
-                            data = {
-                                ...data, [doc.id]: doc.data()
-                            }
-                        })
-                        // salvando novos dados e verificando se tem algum para deletar
-                        return callback({ data: retirarRemovidos(changes, toArray(data)) })
-                    })
-                listeners.push(listener)
-                verificarSeQueryTemResultados(limit, snapshots)
-                retirarDaLista()
-            })
+        let listener = query;
+        if (end != null) {
+            //após a primeira query, existe o start after.
+            listener = listener.startAfter(end)
+        }
+        //padrão que todas as querys terão.
+        listener = listener.limit(limit)
+            .onSnapshot(handleSnap(limit, callback))
+        listeners.push(listener)
     },
     offListeners: () => {
+        //desliga os listeber
         listeners.forEach(listener => listener())
     },
     hasEnded: () => status

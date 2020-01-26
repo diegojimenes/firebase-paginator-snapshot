@@ -42,7 +42,7 @@ const callback = ({data}) => {
   console.log(data)
 }
 
-paginator().more(QUERY(), callback(), limit)
+paginator().get(QUERY(), callback(), limit)
 ```
 
 - verify end of query
