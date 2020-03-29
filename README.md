@@ -5,6 +5,19 @@ install package
 ```sh
 $ npm install firebase-paginator-snapshot
 ```
+
+### get parameters
+List of params
+
+name       | Type    | Description
+---------- | ------- | ---------- |
+query | Function | Query from firebase
+callback | Function | function for received results from firebase query
+limit | Number | limit of documents firebase must return
+key | String | key to identify your data in the paginator object
+
+
+
 ```javascript
 import paginator from 'firebase-paginator-snapshot'
 ```
@@ -31,7 +44,7 @@ const callback = ({data}) => {
   console.log(data)
 }
 
-paginator().get(QUERY(), callback(), limit)
+paginator().get(QUERY(), callback(), limit, 'key')
 ```
 
 - get more items
@@ -42,7 +55,7 @@ const callback = ({data}) => {
   console.log(data)
 }
 
-paginator().get(QUERY(), callback(), limit)
+paginator().get(QUERY(), callback(), limit, 'key')
 ```
 
 - verify end of query
