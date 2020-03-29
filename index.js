@@ -1,3 +1,4 @@
+import _ from 'lodash'
 export var data = {}
 var listeners = []    // list of listeners
 var end = {}       // end position of listener
@@ -40,7 +41,7 @@ const handleSnap = (limit, callback, key) => (snap) => {
     atualizarLista(changes, key)
     verificarSeQueryTemResultados(limit, snap)
     retirarDaLista()
-    return callback({ data: toArray(data[key]) })
+    return callback({ data: _.toArray(data[key]) })
 }
 
 const saveListeners = (query, callback, limit, key) => {

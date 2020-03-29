@@ -44,7 +44,7 @@ const callback = ({data}) => {
   console.log(data)
 }
 
-paginator().get(QUERY(), callback(), limit, 'key')
+paginator().get(QUERY(), callback, limit, 'key')
 ```
 
 - get more items
@@ -55,7 +55,7 @@ const callback = ({data}) => {
   console.log(data)
 }
 
-paginator().get(QUERY(), callback(), limit, 'key')
+paginator().get(QUERY(), callback, limit, 'key')
 ```
 
 - verify end of query
