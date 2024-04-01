@@ -17,11 +17,11 @@ const atualizarLista = (changes, key) => {
                 break;
             }
             case 'added': {
-                data = { ...data, [key]: { ...data[key], [change.doc.id]: change.doc.data() } }
+                data = { ...data, [key]: { ...data[key], [change.doc.id]: {...change.doc.data(), docID: change.doc.id} } }
                 break;
             }
             default: {
-                data = { ...data, [key]: { ...data[key], [change.doc.id]: change.doc.data() } }
+                data = { ...data, [key]: { ...data[key], [change.doc.id]: {...change.doc.data(), docID: change.doc.id} } }
             }
         }
     })
