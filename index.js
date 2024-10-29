@@ -11,17 +11,19 @@ const retirarDaLista = () => {
 
 const atualizarLista = (changes, key) => {
     changes.forEach(change => {
-        switch (change.type) {
-            case 'removed': {
-                delete data[key][change.doc.id];
-                break;
-            }
-            case 'added': {
-                data = { ...data, [key]: { ...data[key], [change.doc.id]: {...change.doc.data(), docID: change.doc.id} } }
-                break;
-            }
-            default: {
-                data = { ...data, [key]: { ...data[key], [change.doc.id]: {...change.doc.data(), docID: change.doc.id} } }
+        if(change?.doc?.data()) {
+            switch (change.type) {
+                case 'removed': {
+                    delete data[key][change.doc.id];
+                    break;
+                }
+                case 'added': {
+                    data = { ...data, [key]: { ...data[key], [change?.doc?.id]: {...change?.doc?.data(), docID: change?.doc?.id} } }
+                    break;
+                }
+                default: {
+                    data = { ...data, [key]: { ...data[key], [change?.doc?.id]: {...change?.doc?.data(), docID: change?.doc?.id} } }
+                }
             }
         }
     })
