@@ -14,7 +14,10 @@ const atualizarLista = (changes, key) => {
         if(change?.doc?.data()) {
             switch (change.type) {
                 case 'removed': {
-                    delete data[key][change.doc.id];
+                    if(data[key] && data[key][change.doc.id]) {
+                        delete data[key][change.doc.id];
+                    }
+                    
                     break;
                 }
                 case 'added': {
